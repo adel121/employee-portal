@@ -257,7 +257,7 @@ def create_manager(request):
         account = User()
         account.first_name = manager_name
         account.username = manager_username
-        account.password = manager_password
+        account.set_password(manager_password)
 
         manager = Manager()
         manager.account = account
@@ -306,7 +306,7 @@ def update_manager(request, manager_pk):
         account = manager.account
         account.first_name = manager_name
         account.username = manager_username
-        account.password = manager_password
+        account.set_password(manager_password)
 
         manager.site = Site.objects.get(pk=manager_site_pk)
         manager.phone_number = manager_phone_number
