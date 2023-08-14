@@ -1,0 +1,21 @@
+{% extends "employees/base.html" %}
+{% block title %}
+  Login
+{% endblock title %}
+{% block content %}
+  <div class="jumbotron container" style="margin-top: 30px;">
+    <h2>Log In</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <hr>
+      <p align="center">
+        <button type="submit" class="btn btn-secondary">Log In</button>
+      </p>
+    </form>
+  </div>
+  <script>
+	$("#id_username").addClass("form-control");
+	$("#id_password").addClass("form-control");
+  </script>
+{% endblock content %}

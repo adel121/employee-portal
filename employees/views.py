@@ -8,6 +8,7 @@ from .constants import *
 from .utils import *
 from django.contrib.auth.decorators import login_required
 
+
 #################################################################################
 #                                                                               #
 #                              Index Views                                      #

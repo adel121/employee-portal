@@ -47,6 +47,15 @@
         color: inherit;
         cursor: pointer;
     }
+
+    #intro-table {
+      margin-top: 10px;
+      margin-left: 10px;
+      border-spacing: 5px;
+      border-collapse: separate;
+    }
+
+    
     </style>
   </head>
   <body>
@@ -63,25 +72,57 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          {% if user.is_admin %}
+        {% if user.is_authenticated %}
+          <ul class="navbar-nav mr-auto">
+            {% if user.is_admin %}
+              <li class="nav-item active">
+                <a class="nav-link" href="{% url 'sites' %}">Sites<span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item active">
+                <a class="nav-link" href="{% url 'managers' %}">Managers<span class="sr-only">(current)</span></a>
+              </li>
+            {% endif %}
             <li class="nav-item active">
-              <a class="nav-link" href="{% url 'sites' %}">Sites<span class="sr-only">(current)</span></a>
+              <a class="nav-link" href="{% url 'employees' %}">Employees<span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item active">
-              <a class="nav-link" href="{% url 'managers' %}">Managers<span class="sr-only">(current)</span></a>
+              <a class="nav-link" href="{% url 'payslips' %}">Payslips<span class="sr-only">(current)</span></a>
             </li>
-          {% endif %}
-          <li class="nav-item active">
-            <a class="nav-link" href="{% url 'employees' %}">Employees<span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item active">
-            <a class="nav-link" href="{% url 'payslips' %}">Payslips<span class="sr-only">(current)</span></a>
-          </li>
-        </ul>
-      </div>
+          </ul>
+        </div>
+        <a style="margin-left:10px" href="{% url 'logout' %}">
+          <button class="btn btn-light">Logout</button>
+        </a>
+      {% endif %}
     </nav>
-    <div id="content" style="padding-top: 10%; " class="container">
+    <table id="intro-table" style="">
+      <tr>
+        <th>User:</th>
+        <td>{{ user.username }}</td>
+      </tr>
+      <tr>
+        <th>Role:</th>
+        <td>
+          {% if user.is_admin %}
+            Admin
+          {% else %}
+            Manager
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Site:</th>
+        <td>
+          {% if user.is_admin %}
+            All Sites
+          {% else %}
+            {{ user.manager.site.name }} - {{ user.manager.site.address }}
+          {% endif %}
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <div id="content" style="padding-top: 4%; " class="container">
       {% block content %}
       {% endblock content %}
     </div>
