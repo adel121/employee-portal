@@ -95,33 +95,35 @@
         </a>
       {% endif %}
     </nav>
-    <table id="intro-table" style="">
-      <tr>
-        <th>User:</th>
-        <td>{{ user.username }}</td>
-      </tr>
-      <tr>
-        <th>Role:</th>
-        <td>
-          {% if user.is_admin %}
-            Admin
-          {% else %}
-            Manager
-          {% endif %}
-        </td>
-      </tr>
-      <tr>
-        <th>Site:</th>
-        <td>
-          {% if user.is_admin %}
-            All Sites
-          {% else %}
-            {{ user.manager.site.name }} - {{ user.manager.site.address }}
-          {% endif %}
-        </td>
-      </tr>
-    </table>
-    <hr />
+    {% if user.is_authenticated %}
+      <table id="intro-table" style="">
+        <tr>
+          <th>User:</th>
+          <td>{{ user.username }}</td>
+        </tr>
+        <tr>
+          <th>Role:</th>
+          <td>
+            {% if user.is_admin %}
+              Admin
+            {% else %}
+              Manager
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <th>Site:</th>
+          <td>
+            {% if user.is_admin %}
+              All Sites
+            {% else %}
+              {{ user.manager.site.name }} - {{ user.manager.site.address }}
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+      <hr />
+    {% endif %}
     <div id="content" style="padding-top: 4%; " class="container">
       {% block content %}
       {% endblock content %}
