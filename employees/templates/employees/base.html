@@ -88,11 +88,13 @@
             <li class="nav-item active">
               <a class="nav-link" href="{% url 'payslips' %}">Payslips<span class="sr-only">(current)</span></a>
             </li>
+            <li>
+              <a style="margin-left:10px" href="{% url 'logout' %}">
+                <button class="btn btn-light">Logout</button>
+              </a>
+            </li>
           </ul>
         </div>
-        <a style="margin-left:10px" href="{% url 'logout' %}">
-          <button class="btn btn-light">Logout</button>
-        </a>
       {% endif %}
     </nav>
     {% if user.is_authenticated %}
