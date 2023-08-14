@@ -1,0 +1,65 @@
+{% extends "employees/base.html" %}
+{% block title %}
+  Update Employee
+{% endblock title %}
+{% block content %}
+  <form action="{% url 'update_employee' employee.pk %}" method="post">
+    <p style="color:red">{{ error }}</p>
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="employeeName">Name</label>
+      <input type="text"
+             class="form-control"
+             id="employeeName"
+             name="name"
+             required
+             placeholder="Enter Employee Name"
+             value="{{ employee.name }}">
+    </div>
+    <div class="form-group">
+      <label for="phoneNumber">Phone Number</label>
+      <input type="text"
+             class="form-control"
+             id="phoneNumber"
+             name="phone_number"
+             value="{{ employee.phone_number }}"
+             placeholder="Enter Employee Phone Number">
+    </div>
+    {% if user.is_admin %}
+      <div class="form-group">
+        <label for="employeeSite">Choose Associated site</label>
+        <select id="employeeSite"
+                name="site"
+                class="form-select form-select-lg mb-3"
+                aria-label=".form-select-lg">
+          {% for site in sites %}
+            <option {% if site.pk == employee.site.pk %}selected{% endif %}
+                    value="{{ site.pk }}">{{ site.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="hourlyRate">Hourly Rate</label>
+        <input type="number"
+               class="form-control"
+               id="hourlyRate"
+               name="hourly_rate"
+               value="{{ employee.hourly_rate }}"
+               placeholder="Enter hourly rate">
+      </div>
+      <div class="form-group">
+        <label for="overtimeFactor">Hourly Rate</label>
+        <input type="number"
+               class="form-control"
+               id="overtimeFactor"
+               name="overtime_factor"
+               value="{{ employee.overtime_factor }}"
+               step="0.01"
+               placeholder="Enter Overtime Factor"
+               aria-describedby="overtimeFactorHelp">
+        <small id="overtimeFactorHelp" class="form-text text-muted">Overtime hours will be multiplied by this factor</small>
+      </div>
+    {% endif %}
+    <button type="submit" class="btn btn-secondary">Submit</button>
+  </form>
+{% endblock content %}

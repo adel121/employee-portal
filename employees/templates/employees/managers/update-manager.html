@@ -1,0 +1,82 @@
+{% extends "employees/base.html" %}
+{% block title %}
+  Update Manager
+{% endblock title %}
+{% block content %}
+  {% if request.user.is_admin %}
+    <form action="{% url 'update_manager' manager.pk %}" method="post">
+      <p style="color:red">{{ error }}</p>
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="managerName">Name</label>
+        <input type="text"
+               class="form-control"
+               id="name"
+               name="name"
+               required
+               placeholder="Enter Manager Name"
+               value="{{ manager.account.first_name }}"
+               aria-describedby="managerNameHelp">
+        <small id="managerNameHelp" class="form-text text-muted">This is the manager's full name</small>
+      </div>
+      <div class="form-group">
+        <label for="username">Login Username</label>
+        <input type="text"
+               class="form-control"
+               id="username"
+               name="username"
+               required
+               aria-describedby="managerUsernameHelp"
+               value="{{ manager.account.username }}"
+               placeholder="Enter username">
+        <small id="managerUsernameHelp" class="form-text text-muted">This will be used to login, it should be unique</small>
+      </div>
+      <div class="form-group">
+        <label for="password">Change Login Password</label>
+        <input type="password"
+               class="form-control"
+               id="password"
+               name="password"
+               required
+               minlength="8"
+               aria-describedby="managerPasswordHelp"
+               placeholder="Enter password">
+        <small id="managerUsernameHelp" class="form-text text-muted">This will be used to login.</small>
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password"
+               class="form-control"
+               id="confirmPassword"
+               name="confirm_password"
+               minlength="8"
+               required
+               placeholder="Enter password again">
+      </div>
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number</label>
+        <input type="text"
+               class="form-control"
+               id="phoneNumber"
+               name="phone_number"
+               value="{{ manager.phone_number }}"
+               placeholder="Enter Manager Phone Number">
+      </div>
+      <div class="form-group">
+        <label for="managerSite">Choose Associated site</label>
+        <select id="managerSite"
+                name="site"
+                class="form-select form-select-lg mb-3"
+                aria-label=".form-select-lg">
+          {% for site in sites %}
+            <option {% if site.pk == manager.site.pk %}selected{% endif %}
+                    value="{{ site.pk }}">{{ site.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn btn-secondary">Submit</button>
+    </form>
+  {% else %}
+    Unauthorized Access
+  {% endif %}
+{% endblock content %}

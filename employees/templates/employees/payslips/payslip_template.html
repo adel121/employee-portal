@@ -1,0 +1,181 @@
+<style>
+  #employees-table {
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    table-layout: fixed;
+  }
+  
+  #employees-table caption {
+    font-size: 1.5em;
+    margin: .5em 0 .75em;
+  }
+  
+  #employees-table tr {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: .35em;
+  }
+  
+  #employees-table th,
+  employees-table td {
+    padding: .625em;
+    text-align: center;
+  }
+  
+  #employees-table th {
+    font-size: .85em;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  
+  @media screen and (max-width: 600px) {
+    #employees-table {
+      border: 0;
+    }
+  
+    #employees-table caption {
+      font-size: 1.3em;
+    }
+    
+    #employees-table thead {
+      border: none;
+      clip: rect(0 0 0 0);
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      padding: 0;
+      position: absolute;
+      width: 1px;
+    }
+    
+    #employees-table tr {
+      border-bottom: 3px solid #ddd;
+      display: block;
+      margin-bottom: .625em;
+    }
+    
+    #employees-table td {
+      border-bottom: 1px solid #ddd;
+      display: block;
+      font-size: .8em;
+      text-align: right;
+    }
+    
+    #employees-table td::before {
+      /*
+      * aria-label has no advantage, it won't be read inside a table
+      content: attr(aria-label);
+      */
+      content: attr(data-label);
+      float: left;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    
+    #employees-table td:last-child {
+      border-bottom: 0;
+    }
+  }
+  
+
+  /* general styling */
+  body {
+    font-family: "Open Sans", sans-serif;
+    line-height: 1.25;
+  
+  }
+
+  #intro-table {
+    width: 200px !important;
+    border: 1px solid red
+    
+  }
+
+  .intro-item {
+
+  }
+
+  .intro-header {
+    font: bold
+  }
+
+</style>
+<body>
+  <div>
+    <div class="intro-item">
+      <span class="intro-header">Employee Name:</span> {{ employee.name }}
+    </div>
+    <div class="intro-item">
+      <span class="intro-header">Employee Phone Number:</span> {{ employee.phone_number }}
+    </div>
+    <div class="intro-item">
+      <span class="intro-header">Associated Site:</span> {{ employee.site.name }} - {{ employee.site.address }}
+    </div>
+    <div class="intro-item">
+      <span class="intro-header">From:</span> {{ from_date }}
+    </div>
+    <div class="intro-item">
+      <span class="intro-header">To:</span> {{ to_date }}
+    </div>
+    <div class="intro-item">
+      <span class="intro-header">Document Type:</span> Employee Payslip
+    </div>
+  </div>
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <table id="employees-table"  style="text-align:center">
+    <caption>Statement Summary</caption>
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Date</th>
+        <th scope="col">Start Time</th>
+        <th scope="col">End Time</th>
+        <th scope="col">Normal Hours</th>
+        <th scope="col">Overtime Hours</th>
+        <th scope="col">Break Hours</th>
+        <th scope="col">Overtime Factor</th>
+        <th scope="col">Hourly Rate</th>
+        <th scope="col">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for workslot in workslots %}
+        <tr {% if not workslot.is_closed %}style="color:red"{% endif %}>
+          <th scope="row">{{ forloop.counter }}</th>
+          <td>{{ workslot.date }}</td>
+          {% if workslot.is_holiday %}
+            <td>OFF</td>
+            <td>OFF</td>
+          {% else %}
+            <td>
+              {% if workslot.start_time is not None %}{{ workslot.start_time }}{% endif %}
+            </td>
+            <td>
+              {% if workslot.end_time is not None %}{{ workslot.end_time }}{% endif %}
+            </td>
+          {% endif %}
+          <th scope="col">{{ workslot.normal_hours }}</th>
+          <th scope="col">{{ workslot.overtime }}</th>
+          <th scope="col">{{ workslot.break_hours }}</th>
+          <th scope="col">{{ workslot.overtime_factor }}</th>
+          <td>{{ workslot.hourly_rate }} $</td>
+          <td>{{ workslot.amount|floatformat:2 }} $</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <br />
+  <br />
+  <div>
+    <div class="intro-item">
+      <span class="intro-header">Total Amount:</span> {{ total_amount }} $
+    </div>
+  </div>
+</body>

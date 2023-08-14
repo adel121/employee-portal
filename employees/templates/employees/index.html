@@ -1,0 +1,99 @@
+{% extends "employees/base.html" %}
+{% block title %}
+  Index
+{% endblock title %}
+{% block content %}
+  <form action="{% url 'index' %}" method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="employee">Select Employee</label>
+      <select class="ui search dropdown fluid" name="employee" id="employee">
+        <option value="intro" disabled hidden>Search by typing the name</option>
+        <option value="ALL_EMPLOYEES">All Employees</option>
+        {% for employee in employees %}
+          <option {% if employee.hourly_rate < 0 %}disabled{% endif %}
+                  {% if employee.pk == prefill_employee_pk %}selected{% endif %}
+                  value="{{ employee.pk }}">{{ employee.name }} - {{ employee.phone_number }}</option>
+        {% endfor %}
+      </select>
+      <script type="text/javascript">
+            jQuery('.ui.search.dropdown')
+              .dropdown();
+      </script>
+    </div>
+    <div class="form-group">
+      <label for="registration_type">Registration Type</label>
+      <select id="registration_type"
+              name="registration_type"
+              class="form-select form-select-lg mb-3"
+              aria-label=".form-select-lg">
+        <option value="Checkin">Checkin</option>
+        <option value="Checkout">Checkout</option>
+        <option value="Hodiday">Holiday</option>
+      </select>
+      <script type="text/javascript">
+            jQuery('.ui.search.dropdown')
+              .dropdown();
+      </script>
+    </div>
+    <div class="form-group">
+      <label for="overtime">Overtime Hours</label>
+      <input type="number"
+             id="overtime"
+             name="overtime"
+             value="0"
+             required
+             step="0.01"
+             class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="date">Date</label>
+      <input type="date" id="date" name="date" value={{ prefill_date }} required class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="time">Time</label>
+      <input type="time" id="time" name="time" class="form-control" step="1800">
+    </div>
+    <button type="submit" class="btn btn-secondary">Register</button>
+  </form>
+  <hr>
+  <div class="alert alert-danger" role="alert" style="text-align:center">Incomplete Registrations (Last 7 days):</div>
+  <table class="table" style="text-align:center">
+    <thead>
+      <tr>
+        <th scope="col">Employee Name</th>
+        <th scope="col">Phone Number</th>
+        <th scope="col">Date</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for missing_registration in missing_registrations %}
+        {% for date in missing_registration.1 %}
+          <tr>
+            <td>{{ missing_registration.0.name }}</td>
+            <td>{{ missing_registration.0.phone_number }}</td>
+            <td>{{ date }}</td>
+            <td>
+              <a href="{% url 'index' %}?emp_pk={{ missing_registration.0.pk }}&date={{ date }}"
+                 class="nostyle">
+                <button type="button" class="btn btn-outline-secondary">
+                  <svg xmlns="http://www.w3.org/2000/svg"
+                       width="16"
+                       height="16"
+                       fill="currentColor"
+                       class="bi bi-box-arrow-in-up"
+                       viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M3.5 10a.5.5 0 0 1-.5-.5v-8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 0 0 1h2A1.5 1.5 0 0 0 14 9.5v-8A1.5 1.5 0 0 0 12.5 0h-9A1.5 1.5 0 0 0 2 1.5v8A1.5 1.5 0 0 0 3.5 11h2a.5.5 0 0 0 0-1h-2z" />
+                    <path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z" />
+                  </svg>
+                  Register
+                </button>
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock content %}

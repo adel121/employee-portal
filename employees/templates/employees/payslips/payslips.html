@@ -1,0 +1,32 @@
+{% extends "employees/base.html" %}
+{% block title %}
+  payslip
+{% endblock title %}
+{% block content %}
+  <form action="{% url 'payslips' %}" method="post" target="_blank">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="employee">Select Employee</label>
+      <select class="ui search dropdown fluid" name="employee" id="employee">
+        <option value="intro" selected disabled hidden>Search by typing the name</option>
+        {% for employee in employees %}
+          <option {% if employee.hourly_rate < 0 %}disabled{% endif %}
+                  value="{{ employee.pk }}">{{ employee.name }} - {{ employee.phone_number }}</option>
+        {% endfor %}
+      </select>
+      <script type="text/javascript">
+            jQuery('.ui.search.dropdown')
+              .dropdown();
+      </script>
+    </div>
+    <div class="form-group">
+      <label for="from_date">From</label>
+      <input type="date" id="from" name="from_date" required class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="to_date">To</label>
+      <input type="date" id="to" name="to_date" required class="form-control">
+    </div>
+    <button type="submit" class="btn btn-secondary">Download Payslip</button>
+  </form>
+{% endblock content %}
