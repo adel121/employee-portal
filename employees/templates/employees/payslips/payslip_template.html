@@ -102,8 +102,24 @@
     font: bold
   }
 
+  .header {
+    margin-top: 100px;
+    padding: 50px;
+    background-color: rgb(128, 95, 168);
+    color: white;
+    text-align: center;
+    margin-bottom: 20px
+  }
 </style>
 <body>
+  <div class="header">
+    <h1>
+      <b>  EMPLOYEE PORTAL </b>
+      <br />
+      <br />
+      At {% now "jS F Y H:i" %}
+    </h1>
+  </div>
   <div>
     <div class="intro-item">
       <span class="intro-header">Employee Name:</span> {{ employee.name }}
@@ -113,6 +129,9 @@
     </div>
     <div class="intro-item">
       <span class="intro-header">Associated Site:</span> {{ employee.site.name }} - {{ employee.site.address }}
+    </div>
+    <div class="intro-item">
+      <span class="intro-header">Expected Daily Amount:</span> {{ employee.expected_daily_amount }} $
     </div>
     <div class="intro-item">
       <span class="intro-header">From:</span> {{ from_date }}
@@ -129,6 +148,9 @@
   <br />
   <br />
   <br />
+  <i>*hint: <b> Amount </b> = <b>hourly_rate</b> x ( <b>overtime_work_hours</b> x <b>overtime_factor</b> + <b>normal_work_hours</b> ) </i>
+  <br />
+  <br />
   <table id="employees-table"  style="text-align:center">
     <caption>Statement Summary</caption>
     <thead>
@@ -137,8 +159,8 @@
         <th scope="col">Date</th>
         <th scope="col">Start Time</th>
         <th scope="col">End Time</th>
-        <th scope="col">Normal Hours</th>
-        <th scope="col">Overtime Hours</th>
+        <th scope="col">Normal Work Hours</th>
+        <th scope="col">Overtime Work Hours</th>
         <th scope="col">Break Hours</th>
         <th scope="col">Overtime Factor</th>
         <th scope="col">Hourly Rate</th>

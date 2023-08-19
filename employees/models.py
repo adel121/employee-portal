@@ -46,6 +46,10 @@ class Employee(models.Model):
                 missing_registrations.remove(str(workslot.date))
 
         return missing_registrations
+    
+    @property
+    def expected_daily_amount(self):
+        return 9 * self.hourly_rate
 
 
 class WorkSlot(models.Model):
