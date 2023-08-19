@@ -77,6 +77,6 @@ class WorkHourRegistrar:
         WorkSlot.objects.bulk_create(self.workslots_to_create, batch_size=1000)
         WorkSlot.objects.bulk_update(
             self.workslots_to_update,
-            ["start_time", "overtime", "start_time", "end_time"],
+            ["start_time","end_time", "overtime", "is_holiday"],
             batch_size=1000,
         )

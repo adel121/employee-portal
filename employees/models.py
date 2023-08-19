@@ -22,13 +22,12 @@ class Employee(models.Model):
     hourly_rate = models.DecimalField(
         decimal_places=2,
         max_digits=12,
-        validators=[validators.MinValueValidator(Decimal("0.01"))],
     )
     overtime_factor = models.DecimalField(
         decimal_places=2,
         max_digits=12,
         default=1,
-        validators=[validators.MinValueValidator(Decimal("0.01"))],
+        validators=[validators.MinValueValidator(Decimal("0.00"))],
     )
 
     def __str__(self) -> str:
@@ -57,19 +56,18 @@ class WorkSlot(models.Model):
     hourly_rate = models.DecimalField(
         decimal_places=2,
         max_digits=12,
-        validators=[validators.MinValueValidator(Decimal("0.01"))],
     )
     overtime = models.DecimalField(
         decimal_places=2,
         max_digits=12,
-        validators=[validators.MinValueValidator(Decimal("0.01"))],
+        validators=[validators.MinValueValidator(Decimal("0.00"))],
     )
 
     overtime_factor = models.DecimalField(
         decimal_places=2,
         max_digits=12,
         default=1,
-        validators=[validators.MinValueValidator(Decimal("0.01"))],
+        validators=[validators.MinValueValidator(Decimal("0.00"))],
     )
 
     is_holiday = models.BooleanField(default=False)

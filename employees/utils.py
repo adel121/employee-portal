@@ -20,6 +20,7 @@ def get_missing_registrations(employees):
             break
         employee_missing_registrations = employee.missing_registrations()
         number_of_missing_registrations += len(employee_missing_registrations)
-        result.append((employee, employee_missing_registrations))
+        if len(employee_missing_registrations) > 0:
+            result.append((employee, employee_missing_registrations))
 
     return result
