@@ -2,6 +2,9 @@
 {% block title %}
   Delete Manager
 {% endblock title %}
+{% block content_header %}
+  Delete Manager
+{% endblock content_header %}
 {% block content %}
   {% if request.user.is_admin %}
     <form action="{% url 'delete_manager' manager.pk %}" method="post">

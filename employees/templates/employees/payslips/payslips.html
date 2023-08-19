@@ -2,13 +2,19 @@
 {% block title %}
   payslip
 {% endblock title %}
+{% block content_header %}
+  Payslip
+{% endblock content_header %}
 {% block content %}
   <form action="{% url 'payslips' %}" method="post" target="_blank">
     {% csrf_token %}
     <div class="form-group">
       <label for="employee">Select Employee</label>
-      <select class="ui search dropdown fluid" name="employee" id="employee">
-        <option value="intro" selected disabled hidden>Search by typing the name</option>
+      <select class="ui search dropdown fluid"
+              name="employee"
+              id="employee"
+              required>
+        <option value="intro" disabled hidden>Search by typing the name</option>
         {% for employee in employees %}
           <option {% if employee.hourly_rate < 0 %}disabled{% endif %}
                   value="{{ employee.pk }}">{{ employee.name }} - {{ employee.phone_number }}</option>

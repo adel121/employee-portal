@@ -2,6 +2,9 @@
 {% block title %}
   Create Site
 {% endblock title %}
+{% block content_header %}
+  Create Site
+{% endblock content_header %}
 {% block content %}
   {% if request.user.is_admin %}
     <form action="{% url 'create_site' %}" method="post">
@@ -12,6 +15,7 @@
                class="form-control"
                id="name"
                name="name"
+               required
                placeholder="Enter Site Name"
                aria-describedby="siteNameHelp">
         <small id="siteNameHelp" class="form-text text-muted">Site name should be unique</small>
@@ -22,6 +26,7 @@
         <input type="text"
                class="form-control"
                id="address"
+               required
                name="address"
                placeholder="Enter Site Address">
       </div>

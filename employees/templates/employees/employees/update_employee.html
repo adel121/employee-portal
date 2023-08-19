@@ -2,6 +2,9 @@
 {% block title %}
   Update Employee
 {% endblock title %}
+{% block content_header %}
+  Update Employee
+{% endblock content_header %}
 {% block content %}
   <form action="{% url 'update_employee' employee.pk %}" method="post">
     <p style="color:red">{{ error }}</p>

@@ -2,6 +2,9 @@
 {% block title %}
   Employees
 {% endblock title %}
+{% block content_header %}
+  Employees
+{% endblock content_header %}
 {% block content %}
   {% if request.user.is_admin %}
     All Employees

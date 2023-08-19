@@ -2,6 +2,9 @@
 {% block title %}
   Create Employee
 {% endblock title %}
+{% block content_header %}
+  Create Employee
+{% endblock content_header %}
 {% block content %}
   <form action="{% url 'create_employee' %}" method="post">
     <p style="color:red">{{ error }}</p>
@@ -23,6 +26,7 @@
              id="phoneNumber"
              name="phone_number"
              value="{{ employee.phone_number }}"
+             required
              placeholder="Enter Employee Phone Number">
     </div>
     {% if user.is_admin %}
@@ -30,6 +34,7 @@
         <label for="employeeSite">Choose Associated site</label>
         <select id="employeeSite"
                 name="site"
+                required
                 class="form-select form-select-lg mb-3"
                 aria-label=".form-select-lg">
           {% for site in sites %}
@@ -44,15 +49,18 @@
                class="form-control"
                id="hourlyRate"
                name="hourly_rate"
+               required
                value="{{ employee.hourly_rate }}"
                placeholder="Enter hourly rate">
       </div>
       <div class="form-group">
         <label for="overtimeFactor">Overtime Factor</label>
         <input type="number"
+               value="1"
                class="form-control"
                id="overtimeFactor"
                name="overtime_factor"
+               required
                value="{{ employee.overtime_factor }}"
                placeholder="Enter Overtime Factor"
                step="0.01"

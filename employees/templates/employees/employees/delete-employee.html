@@ -2,6 +2,9 @@
 {% block title %}
   Delete Employee
 {% endblock title %}
+{% block content_header %}
+  Delete Employee
+{% endblock content_header %}
 {% block content %}
   {% if request.user.is_admin or request.user.manager.site.pk == employee.site.pk %}
     <form action="{% url 'delete_employee' employee.pk %}" method="post">
