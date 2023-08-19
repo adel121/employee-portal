@@ -18,7 +18,7 @@ class Site(models.Model):
 class Employee(models.Model):
     name = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=200)
-    site = models.ForeignKey(Site, on_delete=models.DO_NOTHING)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
     hourly_rate = models.DecimalField(
         decimal_places=2,
         max_digits=12,
@@ -134,7 +134,7 @@ class Administrator(models.Model):
 class Manager(models.Model):
     account = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=200)
-    site = models.ForeignKey(Site, on_delete=models.DO_NOTHING)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return self.account.username + " : " + self.phone_number
