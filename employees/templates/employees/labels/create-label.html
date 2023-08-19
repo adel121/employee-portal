@@ -1,0 +1,38 @@
+{% extends "employees/base.html" %}
+{% block title %}
+  Create Label
+{% endblock title %}
+{% block content_header %}
+  Create Label
+{% endblock content_header %}
+{% block content %}
+  {% if request.user.is_admin %}
+    <form action="{% url 'create_label' %}" method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="labelName">Label Name</label>
+        <input type="text"
+               class="form-control"
+               id="name"
+               name="name"
+               required
+               placeholder="Enter Label Name"
+               aria-describedby="labelNameHelp">
+        <small id="labelNameHelp" class="form-text text-muted">Label name should be unique</small>
+        <p style="color:red">{{ error }}</p>
+      </div>
+      <div class="form-group">
+        <label for="labelNormalWorkingHours">Normal Daily Working Hours</label>
+        <input type="number"
+               class="form-control"
+               id="labelNormalWorkingHours"
+               required
+               name="normal_working_hours"
+               placeholder="Enter Normal Daily Working Hours">
+      </div>
+      <button type="submit" class="btn btn-secondary">Submit</button>
+    </form>
+  {% else %}
+    Unauthorized Access
+  {% endif %}
+{% endblock content %}

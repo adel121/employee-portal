@@ -29,4 +29,8 @@ urlpatterns = [
         name="delete_employee",
     ),
     path("payslips", views.payslips, name="payslips"),
+    path("labels", views.labels, name="labels"),
+    path("create_label", views.create_label, name="create_label"),
+    path("delete_label/<int:label_pk>/", views.delete_label, name="delete_label"),
+    path("update_label/<int:label_pk>/", views.update_label, name="update_label"),
 ]

@@ -202,6 +202,93 @@ def update_site(request, site_pk):
             )
         return redirect(sites)
 
+#################################################################################
+#                                                                               #
+#                              Label Views                                      #
+#                                                                               #
+#################################################################################
+
+
+def save_label(site: Site):
+    try:
+        site.save()
+        return ""
+    except IntegrityError as e:
+        print(e.args)
+        if "UNIQUE constraint" in e.args[0]:
+            return "Label name already exists, choose another name"
+        else:
+            return "Operation failed, contact the administrator"
+
+
+@login_required
+def labels(request):
+    if not request.user.is_admin():
+        return HttpResponseNotAllowed("Unauthorized Access")
+    all_labels = EmployeeLabel.objects.all()
+    return render(request, "employees/labels/labels.html", {"labels": all_labels})
+
+
+@login_required
+def create_label(request):
+    if not request.user.is_admin():
+        return HttpResponseNotAllowed("Unauthorized Access")
+
+    if request.method == "GET":
+        return render(request, "employees/labels/create-label.html", {"error": ""})
+    else:
+        label_name = request.POST.get("name")
+        label_normal_working_hours = request.POST.get("normal_working_hours")
+        new_label = EmployeeLabel()
+        new_label.name = label_name
+        new_label.normal_working_hours = label_normal_working_hours
+        error = save_label(new_label)
+        if error != "":
+            return render(request, "employees/labels/create-label.html", {"error": error})
+        return redirect(labels)
+
+
+@login_required
+def delete_label(request, label_pk):
+    if not request.user.is_admin():
+        return HttpResponseNotAllowed("Unauthorized Access")
+
+    label = EmployeeLabel.objects.get(pk=label_pk)
+
+    if request.method == "GET":
+        return render(request, "employees/labels/delete-label.html", {"label": label})
+    else:
+        if request.POST.get("delete_confirmation", "NO") == "YES":
+            related_employees = Employee.objects.filter(label=label)
+            related_employees.delete()
+            label.delete()
+        return redirect(labels)
+
+
+@login_required
+def update_label(request, label_pk):
+    if not request.user.is_admin():
+        return HttpResponseNotAllowed("Unauthorized Access")
+
+    label = EmployeeLabel.objects.get(pk=label_pk)
+
+    if request.method == "GET":
+        return render(
+            request, "employees/labels/update-label.html", {"label": label, "error": ""}
+        )
+    else:
+        label_name = request.POST.get("name")
+        label_normal_working_hours = request.POST.get("normal_working_hours")
+        label.name = label_name
+        label.normal_working_hours = label_normal_working_hours
+        error = save_label(label)
+        if error != "":
+            return render(
+                request,
+                "employees/labels/update-label.html",
+                {"label": label, "error": error},
+            )
+        return redirect(labels)
 
 #################################################################################
 #                                                                               #
@@ -382,21 +469,25 @@ def employees(request):
 def create_employee_as_manager(request):
     employee_name = request.POST.get("name")
     employee_phone_number = request.POST.get("phone_number")
+    employee_label= request.POST.get("label")
     employee_site = request.user.manager.site
-    employee_hourly_rate = -1
+    employee_daily_rate = -1
 
     employee = Employee()
     employee.name = employee_name
     employee.phone_number = employee_phone_number
     employee.site = employee_site
-    employee.hourly_rate = employee_hourly_rate
+    employee.daily_rate = employee_daily_rate
+    employee.label = EmployeeLabel.objects.get(pk=employee_label)
+
+    labels = EmployeeLabel.objects.all()
 
     error = save_employee(employee)
     if error != "":
         return render(
             request,
             "employees/employees/create-employee.html",
-            {"sites": sites, "error": error, "employee": employee},
+            {"sites": sites, "error": error, "employee": employee, "labels": labels},
         )
     return redirect(employees)
 
@@ -406,22 +497,26 @@ def create_employee_as_admin(request):
     employee_name = request.POST.get("name")
     employee_phone_number = request.POST.get("phone_number")
     employee_site_pk = request.POST.get("site")
-    employee_hourly_rate = request.POST.get("hourly_rate")
+    employee_daily_rate = request.POST.get("daily_rate")
+    employee_label= request.POST.get("label")
     employee_overtime_factor = request.POST.get("overtime_factor")
 
     employee = Employee()
     employee.name = employee_name
     employee.phone_number = employee_phone_number
     employee.site = Site.objects.get(pk=employee_site_pk)
-    employee.hourly_rate = employee_hourly_rate
+    employee.daily_rate = employee_daily_rate
     employee.overtime_factor = employee_overtime_factor
+    employee.label = EmployeeLabel.objects.get(pk=employee_label)
+
+    labels = EmployeeLabel.objects.all()
 
     error = save_employee(employee)
     if error != "":
         return render(
             request,
             "employees/employees/create-employee.html",
-            {"sites": sites, "error": error, "employee": employee},
+            {"sites": sites, "error": error, "employee": employee, "labels": labels},
         )
     return redirect(employees)
 
@@ -431,10 +526,11 @@ def create_employee(request):
     sites = Site.objects.all()
 
     if request.method == "GET":
+        labels = EmployeeLabel.objects.all()
         return render(
             request,
             "employees/employees/create-employee.html",
-            {"sites": sites, "error": ""},
+            {"sites": sites, "labels": labels, "error": ""},
         )
     else:
         user = request.user
@@ -451,14 +547,18 @@ def update_employee_as_admin(request, employee_pk):
     employee_name = request.POST.get("name")
     employee_phone_number = request.POST.get("phone_number")
     employee_site_pk = request.POST.get("site")
-    employee_hourly_rate = request.POST.get("hourly_rate")
+    employee_daily_rate = request.POST.get("daily_rate")
     employee_overtime_factor = request.POST.get("overtime_factor")
+    employee_label= request.POST.get("label")
 
     employee.name = employee_name
     employee.phone_number = employee_phone_number
     employee.site = Site.objects.get(pk=employee_site_pk)
-    employee.hourly_rate = employee_hourly_rate
+    employee.daily_rate = employee_daily_rate
     employee.overtime_factor = employee_overtime_factor
+    employee.label = EmployeeLabel.objects.get(pk=employee_label)
+
+    labels = EmployeeLabel.objects.all()
 
     error = save_employee(employee)
 
@@ -466,7 +566,7 @@ def update_employee_as_admin(request, employee_pk):
         return render(
             request,
             "employees/employees/update_employee.html",
-            {"error": employee, "sites": Site.objects.all(), "employee": employee},
+            {"error": employee, "sites": Site.objects.all(), "employee": employee, "labels": labels},
         )
 
     return redirect(employees)
@@ -478,18 +578,21 @@ def update_employee_as_manager(request, employee_pk):
 
     employee_name = request.POST.get("name")
     employee_phone_number = request.POST.get("phone_number")
+    employee_label= request.POST.get("label")
 
     employee.name = employee_name
     employee.phone_number = employee_phone_number
     employee.site = request.user.manager.site
+    employee.label = EmployeeLabel.objects.get(pk=employee_label)
 
+    labels = EmployeeLabel.objects.all()
     error = save_employee(employee)
 
     if error != "":
         return render(
             request,
             "employees/employees/update_employee.html",
-            {"error": employee, "sites": Site.objects.all(), "employee": employee},
+            {"error": employee, "sites": Site.objects.all(), "employee": employee, "labels": labels},
         )
 
     return redirect(employees)
@@ -498,6 +601,7 @@ def update_employee_as_manager(request, employee_pk):
 @login_required
 def update_employee(request, employee_pk):
     sites = Site.objects.all()
+    labels = EmployeeLabel.objects.all()
 
     if request.method == "GET":
         return render(
@@ -506,6 +610,7 @@ def update_employee(request, employee_pk):
             {
                 "error": "",
                 "sites": sites,
+                "labels": labels,
                 "employee": Employee.objects.get(pk=employee_pk),
             },
         )

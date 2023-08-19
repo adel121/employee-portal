@@ -1,44 +1,29 @@
 {% extends "employees/base.html" %}
 {% block title %}
-  Employees
+  Labels
 {% endblock title %}
 {% block content_header %}
-  Employees
+  Labels
 {% endblock content_header %}
 {% block content %}
-  {% if request.user.is_admin %}
-    All Employees
-  {% else %}
-    Site: {{ request.user.manager.site.name }}
-  {% endif %}
   <table class="table table-sm">
     <thead>
       <tr>
         <th scope="col">#</th>
-        <th scope="col">Name</th>
-        <th scope="col">Phone</th>
-        <th scope="col">Site</th>
         <th scope="col">Label</th>
-        <th scope="col">Daily Rate</th>
-        <th scope="col">Overtime Factor</th>
+        <th scope="col">Normal Daily Hours</th>
         <th scope="col"></th>
         <th scope="col"></th>
       </tr>
     </thead>
     <tbody>
-      {% for employee in employees %}
+      {% for label in labels %}
         <tr>
           <th scope="row">{{ forloop.counter }}</th>
-          <td>{{ employee.name }}</td>
-          <td>{{ employee.phone_number }}</td>
+          <td>{{ label.name }}</td>
+          <td>{{ label.normal_working_hours }}</td>
           <td>
-            <a href="{% url 'update_site' employee.site.pk %}">{{ employee.site.name }}</a>
-          </td>
-          <td>{{ employee.label.name }} ({{ employee.label.normal_working_hours }} hours/day)</td>
-          <td>{{ employee.daily_rate }} $</td>
-          <td>{{ employee.overtime_factor }}</td>
-          <td>
-            <a href="{% url 'update_employee' employee.pk %}" class="nostyle">
+            <a href="{% url 'update_label' label.pk %}" class="nostyle">
               <button type="button" class="btn btn-outline-secondary">
                 <svg xmlns="http://www.w3.org/2000/svg"
                      width="16"
@@ -53,7 +38,7 @@
             </a>
           </td>
           <td>
-            <a href="{% url 'delete_employee' employee.pk %}" class="nostyle">
+            <a href="{% url 'delete_label' label.pk %}" class="nostyle">
               <button type="button" class="btn btn-outline-danger">
                 <svg xmlns="http://www.w3.org/2000/svg"
                      width="16"
@@ -72,14 +57,16 @@
       {% endfor %}
     </tbody>
   </table>
-  <div class="row">
-    <div class="col-sm">
-      <button type="button" class="btn btn-secondary">
-        <a class="nostyle" href="{% url 'create_employee' %}">Create New</a>
-      </button>
+  {% if request.user.is_admin %}
+    <div class="row">
+      <div class="col-sm">
+        <button type="button" class="btn btn-secondary">
+          <a class="nostyle" href="{% url 'create_label' %}">Create New</a>
+        </button>
+      </div>
+      <div class="col-sm"></div>
+      <div class="col-sm"></div>
+      <div class="col-sm"></div>
     </div>
-    <div class="col-sm"></div>
-    <div class="col-sm"></div>
-    <div class="col-sm"></div>
-  </div>
+  {% endif %}
 {% endblock content %}

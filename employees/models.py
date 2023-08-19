@@ -13,15 +13,30 @@ class Site(models.Model):
 
     def __str__(self) -> str:
         return self.name + " : " + self.address
+    
+class EmployeeLabel(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+    normal_working_hours = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        default=1,
+        validators=[validators.MinValueValidator(Decimal("0.00"))],
+    )
+
+    def __str__(self) -> str:
+        return self.name + " : " + self.address
 
 
 class Employee(models.Model):
     name = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=200)
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
-    hourly_rate = models.DecimalField(
+    label = models.ForeignKey(EmployeeLabel, on_delete=models.CASCADE)
+    
+    daily_rate = models.DecimalField(
         decimal_places=2,
         max_digits=12,
+        default = -1
     )
     overtime_factor = models.DecimalField(
         decimal_places=2,
@@ -48,8 +63,9 @@ class Employee(models.Model):
         return missing_registrations
     
     @property
-    def expected_daily_amount(self):
-        return 9 * self.hourly_rate
+    def hourly_rate(self):
+        if self.daily_rate > 0:
+            return self.daily_rate / self.label.normal_working_hours
 
 
 class WorkSlot(models.Model):
