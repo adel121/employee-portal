@@ -190,11 +190,11 @@
               {% if workslot.end_time is not None %}{{ workslot.end_time }}{% endif %}
             </td>
           {% endif %}
-          <th scope="col">{{ workslot.normal_hours }}</th>
-          <th scope="col">{{ workslot.overtime }}</th>
-          <th scope="col">{{ workslot.break_hours }}</th>
+          <th scope="col">{{ workslot.normal_hours|floatformat:2 }}</th>
+          <th scope="col">{{ workslot.overtime|floatformat:2 }}</th>
+          <th scope="col">{{ workslot.break_hours|floatformat:2 }}</th>
           <th scope="col">{{ workslot.overtime_factor }}</th>
-          <td>{{ workslot.hourly_rate }} $</td>
+          <td>{{ workslot.hourly_rate|floatformat:2 }} $</td>
           <td>{{ workslot.amount|floatformat:2 }} $</td>
           <td>{{ workslot.payment_date }}</td>
           <td>
