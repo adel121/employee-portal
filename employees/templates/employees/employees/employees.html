@@ -17,28 +17,45 @@
         <th scope="col">#</th>
         <th scope="col">Name</th>
         <th scope="col">Phone</th>
-        <th scope="col">Site</th>
+        <th scope="col">
+          {% if user.is_admin %}
+            Sites
+          {% else %}
+            Site
+          {% endif %}
+        </th>
         <th scope="col">Label</th>
-        <th scope="col">Daily Rate</th>
+        {% if not user.is_admin %}<th scope="col">Daily Rate</th>{% endif %}
         <th scope="col">Overtime Factor</th>
         <th scope="col"></th>
         <th scope="col"></th>
       </tr>
     </thead>
     <tbody>
-      {% for employee in employees %}
+      {% for employee_with_salary in employees_with_salary %}
         <tr>
           <th scope="row">{{ forloop.counter }}</th>
-          <td>{{ employee.name }}</td>
-          <td>{{ employee.phone_number }}</td>
+          <td>{{ employee_with_salary.0.name }}</td>
+          <td>{{ employee_with_salary.0.phone_number }}</td>
+          {% if user.is_admin %}
+            <td>
+              {% for site in employee_with_salary.0.sites.all %}
+                {{ site.name }}
+                {% if not forloop.last %}
+                  ,
+                  <br />
+                {% endif %}
+              {% endfor %}
+            </td>
+          {% else %}
+            <td>{{ user.manager.site.name }}</td>
+          {% endif %}
+          <td>{{ employee_with_salary.0.label.name }} ({{ employee_with_salary.0.label.normal_working_hours }} hours/day)</td>
+          {% if not user.is_admin %}<td>{{ employee_with_salary.1 }} $</td>{% endif %}
+          <td>{{ employee_with_salary.0.overtime_factor }}</td>
           <td>
-            <a href="{% url 'update_site' employee.site.pk %}">{{ employee.site.name }}</a>
-          </td>
-          <td>{{ employee.label.name }} ({{ employee.label.normal_working_hours }} hours/day)</td>
-          <td>{{ employee.daily_rate }} $</td>
-          <td>{{ employee.overtime_factor }}</td>
-          <td>
-            <a href="{% url 'update_employee' employee.pk %}" class="nostyle">
+            <a href="{% url 'update_employee' employee_with_salary.0.pk %}"
+               class="nostyle">
               <button type="button" class="btn btn-outline-secondary">
                 <svg xmlns="http://www.w3.org/2000/svg"
                      width="16"
@@ -53,7 +70,8 @@
             </a>
           </td>
           <td>
-            <a href="{% url 'delete_employee' employee.pk %}" class="nostyle">
+            <a href="{% url 'delete_employee' employee_with_salary.0.pk %}"
+               class="nostyle">
               <button type="button" class="btn btn-outline-danger">
                 <svg xmlns="http://www.w3.org/2000/svg"
                      width="16"

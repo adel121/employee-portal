@@ -24,20 +24,14 @@ class EmployeeLabel(models.Model):
     )
 
     def __str__(self) -> str:
-        return self.name + " : " + self.address
+        return self.name + " : " + str(self.normal_working_hours) + " hours/day"
 
 
 class Employee(models.Model):
     name = models.CharField(max_length=200)
-    phone_number = models.CharField(max_length=200)
-    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=200, unique=True)
+    sites = models.ManyToManyField(Site, through="EmployeeSiteAssignment")
     label = models.ForeignKey(EmployeeLabel, on_delete=models.CASCADE)
-    
-    daily_rate = models.DecimalField(
-        decimal_places=2,
-        max_digits=12,
-        default = -1
-    )
     overtime_factor = models.DecimalField(
         decimal_places=2,
         max_digits=12,
@@ -57,22 +51,53 @@ class Employee(models.Model):
             Q(employee=self) & Q(date__lte=today) & Q(date__gte=last_week)
         )
         for workslot in workslots:
-            if workslot.is_closed:
+            if workslot.is_closed and str(workslot.date) in missing_registrations:
                 missing_registrations.remove(str(workslot.date))
 
         return missing_registrations
     
+    def get_sites_daily_rates(self):
+        sites = Site.objects.all()
+        result = []
+        for site in sites:
+            assignment = EmployeeSiteAssignment.objects.filter(employee = self, site = site)
+            daily_rate = ""
+            if assignment:
+                daily_rate = assignment.first().daily_rate
+            result.append((site, daily_rate))
+        return result
+
+
+class EmployeeSiteAssignment(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    daily_rate = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        default = -1
+    )
+
+    class Meta:
+        unique_together = ('employee', 'site')
+    
     @property
     def hourly_rate(self):
         if self.daily_rate > 0:
-            return self.daily_rate / self.label.normal_working_hours
+            return self.daily_rate / self.employee.label.normal_working_hours
+        return -1
+        
+    def __str__(self):
+        return self.employee.name + " : " + self.site.name
 
+    
+    
 
 class WorkSlot(models.Model):
     start_time = models.TimeField(blank=True, null=True)
     end_time = models.TimeField(blank=True, null=True)
     date = models.DateField()
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
     hourly_rate = models.DecimalField(
         decimal_places=2,
         max_digits=12,
@@ -82,7 +107,6 @@ class WorkSlot(models.Model):
         max_digits=12,
         validators=[validators.MinValueValidator(Decimal("0.00"))],
     )
-
     overtime_factor = models.DecimalField(
         decimal_places=2,
         max_digits=12,
@@ -131,7 +155,7 @@ class WorkSlot(models.Model):
         return normal_pay + overtime_pay
 
     def __str__(self) -> str:
-        return self.date.__str__() + " : " + self.employee.name
+        return self.employee.name + " : " + self.site.name + " : " + self.date.__str__() 
 
 
 class User(AbstractUser):

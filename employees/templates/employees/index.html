@@ -30,6 +30,7 @@
               name="registration_type"
               class="form-select form-select-lg mb-3"
               aria-label=".form-select-lg">
+        <option value="Checkin-Checkout">Checkin / Checkout</option>
         <option value="Checkin">Checkin</option>
         <option value="Checkout">Checkout</option>
         <option value="Holiday">Holiday</option>
@@ -38,6 +39,34 @@
             jQuery('.ui.search.dropdown')
               .dropdown();
       </script>
+    </div>
+    <div id="time" style="display:flex; gap: 10px">
+      <div id="checkin-time-input" class="form-group">
+        <label for="checkin-time">Checkin Time</label>
+        <input type="time"
+               id="checkin-time"
+               name="checkin-time"
+               class="form-control"
+               step="1800">
+      </div>
+      <div id="checkout-time-input"  class="form-group">
+        <label for="checkout-time">Checkout Time</label>
+        <input type="time"
+               id="checkout-time"
+               name="checkout-time"
+               class="form-control"
+               step="1800">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="site">Choose Site</label>
+      <select id="site"
+              name="site"
+              required
+              class="form-select form-select-lg mb-3"
+              aria-label=".form-select-lg">
+        {% for site in sites %}<option value="{{ site.pk }}">{{ site.name }}</option>{% endfor %}
+      </select>
     </div>
     <div class="form-group">
       <label for="overtime">Overtime Hours</label>
@@ -57,10 +86,6 @@
         <input type="date" id="date" name="date" value={{ prefill_date }} required class="form-control">
       {% endif %}
     </div>
-    <div class="form-group">
-      <label for="time">Time</label>
-      <input type="time" id="time" name="time" class="form-control" step="1800">
-    </div>
     <button type="submit" class="btn btn-secondary">Register</button>
   </form>
   <hr>
@@ -76,6 +101,7 @@
           <th scope="col">Employee Name</th>
           <th scope="col">Phone Number</th>
           <th scope="col">Date</th>
+          <th scope="col">Site</th>
           <th scope="col"></th>
         </tr>
       </thead>
@@ -86,8 +112,9 @@
               <td>{{ missing_registration.0.name }}</td>
               <td>{{ missing_registration.0.phone_number }}</td>
               <td>{{ date }}</td>
+              <td>{{ missing_registration.2 }}</td>
               <td>
-                {% if missing_registration.0.hourly_rate > 0 %}
+                {% if missing_registration.2 == '' %}
                   <a href="{% url 'index' %}?emp_pk={{ missing_registration.0.pk }}&date={{ date }}"
                      class="nostyle">
                     <button type="button" class="btn btn-outline-secondary">
@@ -120,11 +147,31 @@
     
 
     function modifyRequiredOnTime(registration_type_value) {
-      if (registration_type_value != "Holiday") {
-        $("#time").prop('required', true);
+      if (registration_type_value == "Holiday") {
+        $("#time").hide()
+        $("#checkin-time").prop('required',false);
+        $("#checkout-time").prop('required',false);
+      }
+      else if (registration_type_value == "Checkin") {
+        $("#time").show()
+        $("#checkin-time-input").show()
+        $("#checkout-time-input").hide()
+        $("#checkin-time").prop('required',true);
+        $("#checkout-time").prop('required',false);
+      }
+      else if (registration_type_value == "Checkout") {
+        $("#time").show()
+        $("#checkin-time-input").hide()
+        $("#checkout-time-input").show()
+        $("#checkin-time").prop('required',false);
+        $("#checkout-time").prop('required',true);
       }
       else {
-        $("#time").prop('required', false);
+        $("#time").show()
+        $("#checkin-time-input").show()
+        $("#checkout-time-input").show()
+        $("#checkin-time").prop('required',true);
+        $("#checkout-time").prop('required',true);
       }
     }
 
@@ -132,7 +179,6 @@
 
     registration_type.on('change', function() {
       modifyRequiredOnTime(this.value);
-
     });
 
   </script>

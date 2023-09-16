@@ -1,6 +1,4 @@
 from datetime import date, timedelta
-from .models import *
-
 
 def get_last_seven_dates():
     today = date.today()
@@ -11,17 +9,36 @@ def get_last_seven_dates():
     return dates
 
 
-def get_missing_registrations(employees):
+def get_missing_registrations(employees, site = None):
+    from .models import EmployeeSiteAssignment
     result = []
     number_of_missing_registrations = 0
 
     for employee in employees:
+        print(employee)
         if number_of_missing_registrations > 20:
             break
+
+        assignments = EmployeeSiteAssignment.objects.filter(employee=employee, daily_rate__lt = 0)
+        print(list(assignments))
+
+        if site is not None:
+            assignments = assignments.filter(site = site)
+
+        print(list(assignments))
+
         employee_missing_registrations = list(employee.missing_registrations())
+
+        missing_site = ""
+
+        if assignments:
+            missing_site = assignments.first().site.name
+
+        print(missing_site)
+
         employee_missing_registrations.sort(reverse=True)
         number_of_missing_registrations += len(employee_missing_registrations)
         if len(employee_missing_registrations) > 0:
-            result.append((employee, employee_missing_registrations))
+            result.append((employee, employee_missing_registrations, missing_site))
 
     return result

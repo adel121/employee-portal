@@ -20,36 +20,53 @@
              value="{{ employee.name }}">
     </div>
     <div class="form-group">
-      <label for="phoneNumber">Phone Number</label>
+      <label for="phoneNumber">Phone Number [example: 03123456]</label>
       <input type="text"
              class="form-control"
              id="phoneNumber"
              name="phone_number"
+             pattern="[0-9]{8}"
+             maxlength="8"
+             required
              value="{{ employee.phone_number }}"
              placeholder="Enter Employee Phone Number">
     </div>
     {% if user.is_admin %}
       <div class="form-group">
-        <label for="employeeSite">Choose Associated site</label>
-        <select id="employeeSite"
-                name="site"
-                class="form-select form-select-lg mb-3"
-                aria-label=".form-select-lg">
-          {% for site in sites %}
-            <option {% if site.pk == employee.site.pk %}selected{% endif %}
-                    value="{{ site.pk }}">{{ site.name }}</option>
-          {% endfor %}
-        </select>
+        <label>Enter daily rate ($) for the new employee sites</label>
+        {% for sites_with_daily_rate in sites_with_daily_rates %}
+          <div style="display: flex; gap: 20px">
+            <div class="form-group">
+              <input type="text"
+                     class="form-control"
+                     id="sitename"
+                     name="{{ sites_with_daily_rate.0.name }}"
+                     value="{{ sites_with_daily_rate.0.name }}"
+                     disabled>
+            </div>
+            <div class="form-group">
+              <input type="number"
+                     class="form-control"
+                     id="{{ sites_with_daily_rate.0.name }}.daily-rate"
+                     name="{{ sites_with_daily_rate.0.name }}.daily-rate"
+                     value="{{ sites_with_daily_rate.1 }}"
+                     placeholder="Enter daily rate in $ for this site">
+            </div>
+          </div>
+        {% endfor %}
       </div>
-      <div class="form-group">
-        <label for="dailyRate">Daily Rate ($)</label>
-        <input type="number"
-               class="form-control"
-               id="dailyRate"
-               name="daily_rate"
-               value="{{ employee.daily_rate }}"
-               placeholder="Enter daily rate">
-      </div>
+      {% if not user.is_admin %}
+        <div class="form-group">
+          <label for="dailyRate">Daily Rate ($)</label>
+          <input type="number"
+                 class="form-control"
+                 id="dailyRate"
+                 name="daily_rate"
+                 required
+                 value="{{ employee.daily_rate }}"
+                 placeholder="Enter daily rate">
+        </div>
+      {% endif %}
       <div class="form-group">
         <label for="overtimeFactor">Overtime Factor</label>
         <input type="number"
