@@ -1,1 +1,2 @@
 ALL_EMPLOYEES = "ALL_EMPLOYEES"
+MARK_AS_PAID = "mark_paid"

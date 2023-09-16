@@ -157,6 +157,7 @@
       <tr>
         <th scope="col">#</th>
         <th scope="col">Date</th>
+        <th scope="col">Site</th>
         <th scope="col">Start Time</th>
         <th scope="col">End Time</th>
         <th scope="col">Normal Work Hours</th>
@@ -165,6 +166,7 @@
         <th scope="col">Overtime Factor</th>
         <th scope="col">Hourly Rate</th>
         <th scope="col">Amount</th>
+        <th scope="col">Payment State</th>
       </tr>
     </thead>
     <tbody>
@@ -172,6 +174,7 @@
         <tr {% if not workslot.is_closed %}style="color:red"{% endif %}>
           <th scope="row">{{ forloop.counter }}</th>
           <td>{{ workslot.date }}</td>
+          <td>{{ workslot.site.name }}</td>
           {% if workslot.is_holiday %}
             <td>OFF</td>
             <td>OFF</td>
@@ -189,6 +192,13 @@
           <th scope="col">{{ workslot.overtime_factor }}</th>
           <td>{{ workslot.hourly_rate }} $</td>
           <td>{{ workslot.amount|floatformat:2 }} $</td>
+          <td>
+            {% if workslot.is_paid or workslot.is_holiday %}
+              PAID
+            {% else %}
+              PENDING
+            {% endif %}
+          </td>
         </tr>
       {% endfor %}
     </tbody>
@@ -197,7 +207,13 @@
   <br />
   <div>
     <div class="intro-item">
-      <span class="intro-header">Total Amount:</span> {{ total_amount }} $
+      <span class="intro-header">Total Paid:</span> {{ total_paid|floatformat:2 }} $
+    </div>
+    <div class="intro-item">
+      <span class="intro-header">Total Pending:</span> {{ total_pending|floatformat:2 }} $
+    </div>
+    <div class="intro-item">
+      <span class="intro-header">Total Amount:</span> {{ total_amount|floatformat:2 }} $
     </div>
   </div>
 </body>

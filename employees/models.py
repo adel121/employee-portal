@@ -115,6 +115,7 @@ class WorkSlot(models.Model):
     )
 
     is_holiday = models.BooleanField(default=False)
+    is_paid = models.BooleanField(default=False)
 
     @property
     def is_closed(self):

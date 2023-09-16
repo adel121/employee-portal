@@ -24,7 +24,7 @@ def register_work_hours_as_manager(request):
     if employee_pk != ALL_EMPLOYEES:
         employees = employees.filter(pk=employee_pk)
 
-        if not employees or request.user.manager.site not in employees.first().sites.all():
+        if not employees or not EmployeeSiteAssignment.objects.filter(employee = employees.first(), site = request.user.manager.site).exists():
             return HttpResponseNotAllowed("Unauthorized Access")
 
     registration_type = request.POST.get("registration_type")
@@ -42,8 +42,7 @@ def register_work_hours_as_manager(request):
     elif registration_type == "Checkout":
         workslot_registrar.register_checkout(checkout_time)
     elif registration_type == "Checkin-Checkout":
-        workslot_registrar.register_checkin(checkin_time)
-        workslot_registrar.register_checkout(checkout_time)
+        workslot_registrar.register_checkin_checkout(checkin_time, checkout_time)
     else:
         workslot_registrar.register_holiday()
 
@@ -79,8 +78,7 @@ def register_work_hours_as_admin(request):
     elif registration_type == "Checkout":
         workslot_registrar.register_checkout(checkout_time)
     elif registration_type == "Checkin-Checkout":
-        workslot_registrar.register_checkin(checkin_time)
-        workslot_registrar.register_checkout(checkout_time)
+        workslot_registrar.register_checkin_checkout(checkin_time, checkout_time)
     else:
         workslot_registrar.register_holiday()
 
@@ -658,7 +656,6 @@ def update_employee_as_admin(request, employee_pk):
             error = attach_employee_to_site(employee ,daily_rate[0], daily_rate[1])
             if error != "":
                 break
-    sites = Site.objects.all()
     if error != "":
         return render(
             request,
@@ -724,7 +721,7 @@ def delete_employee(request, employee_pk):
     employee = Employee.objects.get(pk=employee_pk)
 
     if not request.user.is_admin():
-        if request.user.manager.site.pk != employee.site.pk:
+        if not EmployeeSiteAssignment.objects.filter(employee = employee, site = request.user.manager.site).exists():
             return HttpResponseNotAllowed("Unauthorized Access")
 
     if request.method == "GET":
@@ -751,7 +748,7 @@ def payslips(request):
     user = request.user
 
     if not request.user.is_admin():
-        employees = employees.filter(site=user.manager.site)
+        employees = employees.filter(sites__pk=user.manager.site.pk)
 
     if request.method == "GET":
         return render(
@@ -764,10 +761,12 @@ def payslips(request):
         from_date = request.POST.get("from_date")
         to_date = request.POST.get("to_date")
         employee = Employee.objects.get(pk=employee_pk)
+        mode = request.POST.get("mode")
+        mark_as_paid = mode == MARK_AS_PAID
 
         if not user.is_admin():
             if employee.site != user.manager.site:
                 return HttpResponseNotAllowed("Unauthorized Access")
 
-        payslip_generator = PayslipGenerator(employee, from_date, to_date)
+        payslip_generator = PayslipGenerator(employee, from_date, to_date, mark_as_paid)
         return payslip_generator.generate_payslip()

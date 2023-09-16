@@ -15,12 +15,16 @@ class WorkHourRegistrar:
             assignment = EmployeeSiteAssignment.objects.filter(employee=employee, site= site)
             if not assignment:
                 continue
+
+            if assignment.first().hourly_rate < 0:
+                continue
             workslot = WorkSlot()
             if WorkSlot.objects.filter(employee=employee, site=site, date=self.date).exists():
                 workslot = WorkSlot.objects.filter(
                     employee=employee, date=self.date
                 ).first()
                 workslot.overtime = overtime
+                workslot.is_paid = False
                 self.workslots_to_update.append(workslot)
             else:
                 workslot.employee = employee
@@ -34,37 +38,44 @@ class WorkHourRegistrar:
 
     def register_checkin(self, time):
         for workslot in self.workslots_to_update:
-            if workslot.hourly_rate < 0:
-                continue
             workslot.start_time = time
             workslot.is_holiday = False
         for workslot in self.workslots_to_create:
-            if workslot.hourly_rate < 0:
-                continue
             workslot.start_time = time
         WorkSlot.objects.bulk_create(self.workslots_to_create, batch_size=1000)
         WorkSlot.objects.bulk_update(
             self.workslots_to_update,
-            ["start_time", "overtime", "is_holiday"],
+            ["start_time", "overtime", "is_holiday", "is_paid"],
             batch_size=1000,
         )
 
     def register_checkout(self, time):
         for workslot in self.workslots_to_update:
-            if workslot.hourly_rate < 0:
-                continue
             workslot.end_time = time
             workslot.is_holiday = False
         for workslot in self.workslots_to_create:
-            if workslot.hourly_rate < 0:
-                continue
             workslot.end_time = time
         WorkSlot.objects.bulk_create(self.workslots_to_create, batch_size=1000)
         WorkSlot.objects.bulk_update(
             self.workslots_to_update,
-            ["end_time", "overtime", "is_holiday"],
+            ["end_time", "overtime", "is_holiday", "is_paid"],
             batch_size=1000,
         )
+
+    def register_checkin_checkout(self, start_time, end_time):
+        for workslot in self.workslots_to_update:
+            workslot.start_time = start_time
+            workslot.end_time = end_time
+            workslot.is_holiday = False
+        for workslot in self.workslots_to_create:
+            workslot.start_time = start_time
+            workslot.end_time = end_time
+        WorkSlot.objects.bulk_create(self.workslots_to_create, batch_size=1000)
+        WorkSlot.objects.bulk_update(
+            self.workslots_to_update,
+            ["end_time", "overtime", "is_holiday", "is_paid"],
+            batch_size=1000,
+        )        
 
     def register_holiday(self):
         for workslot in self.workslots_to_update:
@@ -81,6 +92,6 @@ class WorkHourRegistrar:
         WorkSlot.objects.bulk_create(self.workslots_to_create, batch_size=1000)
         WorkSlot.objects.bulk_update(
             self.workslots_to_update,
-            ["start_time","end_time", "overtime", "is_holiday"],
+            ["start_time","end_time", "overtime", "is_holiday", "is_paid"],
             batch_size=1000,
         )

@@ -8,10 +8,11 @@ from django.http import HttpResponse
 
 
 class PayslipGenerator:
-    def __init__(self, employee, from_date, to_date):
+    def __init__(self, employee, from_date, to_date, mark_as_paid=False):
         self.employee = employee
         self.from_date = from_date
         self.to_date = to_date
+        self.mark_as_paid = mark_as_paid
         self.workslots = []
 
     def generate_payslip(self):
@@ -24,12 +25,23 @@ class PayslipGenerator:
             & Q(date__gte=self.from_date)
             & Q(date__lte=self.to_date)
         ).order_by("date")
+        
+        if self.mark_as_paid:
+            for workslot in workslots:
+                workslot.is_paid = True
         return workslots
 
     def __get_template_context(self):
         total_amount = Decimal(0)
+        total_paid = Decimal(0)
+        total_pending = Decimal(0)
         for workslot in self.workslots:
-            total_amount += workslot.amount
+            if workslot.is_paid:
+                total_paid += workslot.amount
+            else:
+                total_pending += workslot.amount
+            
+        total_amount = total_pending + total_paid
 
         return {
             "employee": self.employee,
@@ -37,6 +49,8 @@ class PayslipGenerator:
             "to_date": self.to_date,
             "workslots": self.workslots,
             "total_amount": total_amount,
+            "total_paid": total_paid,
+            "total_pending": total_pending,
             "page_size": "A4",
         }
 
@@ -46,5 +60,7 @@ class PayslipGenerator:
         result = BytesIO()
         pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
         if not pdf.err:
-            return HttpResponse(result.getvalue(), content_type="application/pdf")
+            result = HttpResponse(result.getvalue(), content_type="application/pdf")
+            WorkSlot.objects.bulk_update(self.workslots, ["is_paid",], batch_size=1000,)
+            return result
         return HttpResponse("We had some errors<pre>%s</pre>" % html)
