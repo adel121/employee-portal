@@ -42,7 +42,17 @@
         <option value="readonly">Readonly</option>
         {% if user.is_admin %}<option value="mark_paid">Mark as paid</option>{% endif %}
       </select>
+      <small id="caution" style="color:red; display: none"> ATTENTION: this mode will mark registrations as paid. Choose READONLY mode if you want to view employee payslips in readonly mode without registering payments </small>
     </div>
     <button type="submit" class="btn btn-secondary">Download Payslip</button>
   </form>
+  <script>
+    var mode = $("#mode")
+    
+
+    mode.on('change', function() {
+      $("#caution").toggle()
+    });
+
+  </script>
 {% endblock content %}

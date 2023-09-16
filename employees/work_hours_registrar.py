@@ -3,9 +3,10 @@ from .utils import *
 
 
 class WorkHourRegistrar:
-    def __init__(self, employees, date, overtime, site):
+    def __init__(self, employees, date, overtime, break_hours, site):
         self.employees = employees
         self.date = date
+        self.break_hours = break_hours
         self.site = site
         self.overtime = overtime
         self.workslots_to_update = []
@@ -25,6 +26,8 @@ class WorkHourRegistrar:
                 ).first()
                 workslot.overtime = overtime
                 workslot.is_paid = False
+                workslot.break_hours = self.break_hours
+                workslot.payment_date = None
                 self.workslots_to_update.append(workslot)
             else:
                 workslot.employee = employee
@@ -34,6 +37,7 @@ class WorkHourRegistrar:
                 workslot.date = date
                 workslot.site = site
                 workslot.overtime = overtime
+                workslot.break_hours = self.break_hours
                 self.workslots_to_create.append(workslot)
 
     def register_checkin(self, time):
@@ -45,7 +49,7 @@ class WorkHourRegistrar:
         WorkSlot.objects.bulk_create(self.workslots_to_create, batch_size=1000)
         WorkSlot.objects.bulk_update(
             self.workslots_to_update,
-            ["start_time", "overtime", "is_holiday", "is_paid"],
+            ["start_time", "overtime", "is_holiday", "is_paid", "break_hours", "payment_date"],
             batch_size=1000,
         )
 
@@ -58,7 +62,7 @@ class WorkHourRegistrar:
         WorkSlot.objects.bulk_create(self.workslots_to_create, batch_size=1000)
         WorkSlot.objects.bulk_update(
             self.workslots_to_update,
-            ["end_time", "overtime", "is_holiday", "is_paid"],
+            ["end_time", "overtime", "is_holiday", "is_paid", "break_hours", "payment_date"],
             batch_size=1000,
         )
 
@@ -73,7 +77,7 @@ class WorkHourRegistrar:
         WorkSlot.objects.bulk_create(self.workslots_to_create, batch_size=1000)
         WorkSlot.objects.bulk_update(
             self.workslots_to_update,
-            ["end_time", "overtime", "is_holiday", "is_paid"],
+            ["end_time", "overtime", "is_holiday", "is_paid", "break_hours", "payment_date"],
             batch_size=1000,
         )        
 
@@ -92,6 +96,6 @@ class WorkHourRegistrar:
         WorkSlot.objects.bulk_create(self.workslots_to_create, batch_size=1000)
         WorkSlot.objects.bulk_update(
             self.workslots_to_update,
-            ["start_time","end_time", "overtime", "is_holiday", "is_paid"],
+            ["start_time","end_time", "overtime", "is_holiday", "is_paid", "break_hours", "payment_date"],
             batch_size=1000,
         )

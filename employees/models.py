@@ -98,6 +98,7 @@ class WorkSlot(models.Model):
     date = models.DateField()
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    payment_date = models.DateField(default=None, null=True)
     hourly_rate = models.DecimalField(
         decimal_places=2,
         max_digits=12,
@@ -106,6 +107,12 @@ class WorkSlot(models.Model):
         decimal_places=2,
         max_digits=12,
         validators=[validators.MinValueValidator(Decimal("0.00"))],
+    )
+    break_hours = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        validators=[validators.MinValueValidator(Decimal("0.00"))],
+        default=0
     )
     overtime_factor = models.DecimalField(
         decimal_places=2,
@@ -126,11 +133,6 @@ class WorkSlot(models.Model):
         return False
 
     @property
-    def total_hours(self):
-        if not self.is_closed or self.is_holiday:
-            return 0
-
-    @property
     def normal_hours(self):
         if not self.is_closed or self.is_holiday:
             return 0
@@ -140,12 +142,6 @@ class WorkSlot(models.Model):
             (end_datetime - start_datetime).total_seconds() / 3600
         )
         return total_working_hours - self.break_hours - self.overtime
-
-    @property
-    def break_hours(self):
-        if not self.is_closed or self.is_holiday:
-            return 0
-        return 1
 
     @property
     def amount(self):

@@ -142,6 +142,9 @@
     <div class="intro-item">
       <span class="intro-header">Document Type:</span> Employee Payslip
     </div>
+    <div class="intro-item">
+      <span class="intro-header">Extraction Mode:</span> {{ extraction_mode }}
+    </div>
   </div>
   <br />
   <br />
@@ -166,6 +169,7 @@
         <th scope="col">Overtime Factor</th>
         <th scope="col">Hourly Rate</th>
         <th scope="col">Amount</th>
+        <th scope="col">Payment Date</th>
         <th scope="col">Payment State</th>
       </tr>
     </thead>
@@ -192,6 +196,7 @@
           <th scope="col">{{ workslot.overtime_factor }}</th>
           <td>{{ workslot.hourly_rate }} $</td>
           <td>{{ workslot.amount|floatformat:2 }} $</td>
+          <td>{{ workslot.payment_date }}</td>
           <td>
             {% if workslot.is_paid or workslot.is_holiday %}
               PAID

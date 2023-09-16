@@ -5,7 +5,8 @@ from xhtml2pdf import pisa
 from django.template.loader import get_template
 from django.template import Context
 from django.http import HttpResponse
-
+from datetime import date
+from .constants import *
 
 class PayslipGenerator:
     def __init__(self, employee, from_date, to_date, mark_as_paid=False):
@@ -25,10 +26,12 @@ class PayslipGenerator:
             & Q(date__gte=self.from_date)
             & Q(date__lte=self.to_date)
         ).order_by("date")
-        
+
         if self.mark_as_paid:
+            workslots = workslots.filter(is_paid = False)
             for workslot in workslots:
                 workslot.is_paid = True
+                workslot.payment_date = date.today()
         return workslots
 
     def __get_template_context(self):
@@ -51,6 +54,7 @@ class PayslipGenerator:
             "total_amount": total_amount,
             "total_paid": total_paid,
             "total_pending": total_pending,
+            "extraction_mode": PROOF_OF_PAYMENT if self.mark_as_paid else READONLY,
             "page_size": "A4",
         }
 
@@ -61,6 +65,6 @@ class PayslipGenerator:
         pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
         if not pdf.err:
             result = HttpResponse(result.getvalue(), content_type="application/pdf")
-            WorkSlot.objects.bulk_update(self.workslots, ["is_paid",], batch_size=1000,)
+            WorkSlot.objects.bulk_update(self.workslots, ["is_paid", "payment_date"], batch_size=1000,)
             return result
         return HttpResponse("We had some errors<pre>%s</pre>" % html)

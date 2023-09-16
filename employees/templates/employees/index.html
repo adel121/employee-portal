@@ -57,6 +57,16 @@
                class="form-control"
                step="1800">
       </div>
+      <div class="form-group">
+        <label for="break_hours">Break Hours</label>
+        <input type="number"
+               id="break_hours"
+               name="break_hours"
+               value="1"
+               required
+               step="0.01"
+               class="form-control">
+      </div>
     </div>
     <div class="form-group">
       <label for="site">Choose Site</label>
@@ -149,11 +159,13 @@
     function modifyRequiredOnTime(registration_type_value) {
       if (registration_type_value == "Holiday") {
         $("#time").hide()
+        $("#break_hours").val(0);
         $("#checkin-time").prop('required',false);
         $("#checkout-time").prop('required',false);
       }
       else if (registration_type_value == "Checkin") {
         $("#time").show()
+        $("#break_hours").val(1);
         $("#checkin-time-input").show()
         $("#checkout-time-input").hide()
         $("#checkin-time").prop('required',true);
@@ -161,6 +173,7 @@
       }
       else if (registration_type_value == "Checkout") {
         $("#time").show()
+        $("#break_hours").val(1);
         $("#checkin-time-input").hide()
         $("#checkout-time-input").show()
         $("#checkin-time").prop('required',false);
@@ -168,6 +181,7 @@
       }
       else {
         $("#time").show()
+        $("#break_hours").val(1);
         $("#checkin-time-input").show()
         $("#checkout-time-input").show()
         $("#checkin-time").prop('required',true);

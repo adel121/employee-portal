@@ -32,10 +32,11 @@ def register_work_hours_as_manager(request):
     checkin_time = request.POST.get("checkin-time", None)
     checkout_time = request.POST.get("checkout-time", None)
     overtime = request.POST.get("overtime", 0)
+    break_hours = request.POST.get("break_hours")
     site_pk = request.POST.get("site")
     site = Site.objects.get(pk = site_pk)
 
-    workslot_registrar = WorkHourRegistrar(employees, date, overtime, site)
+    workslot_registrar = WorkHourRegistrar(employees, date, overtime, break_hours, site)
 
     if registration_type == "Checkin":
         workslot_registrar.register_checkin(checkin_time)
@@ -63,6 +64,7 @@ def register_work_hours_as_admin(request):
     checkin_time = request.POST.get("checkin-time", None)
     checkout_time = request.POST.get("checkout-time", None)
     overtime = request.POST.get("overtime", 0)
+    break_hours = request.POST.get("break_hours")
     site_pk = request.POST.get("site")
     site = Site.objects.get(pk = site_pk)
 
@@ -71,7 +73,7 @@ def register_work_hours_as_admin(request):
     if employee_pk != ALL_EMPLOYEES:
         employees = employees.filter(pk=employee_pk)
 
-    workslot_registrar = WorkHourRegistrar(employees, date, overtime, site)
+    workslot_registrar = WorkHourRegistrar(employees, date, overtime, break_hours, site)
 
     if registration_type == "Checkin":
         workslot_registrar.register_checkin(checkin_time)
@@ -137,7 +139,6 @@ def save_site(site: Site):
         site.save()
         return ""
     except IntegrityError as e:
-        print(e.args)
         if "UNIQUE constraint" in e.args[0]:
             return "Site name already exists, choose another name"
         else:
@@ -183,7 +184,6 @@ def delete_site(request, site_pk):
     else:
         if request.POST.get("delete_confirmation", "NO") == "YES":
             related_managers = Manager.objects.filter(site=site)
-            print(related_managers)
             related_managers.delete()
             site.delete()
         return redirect(sites)
@@ -226,7 +226,6 @@ def save_label(site: Site):
         site.save()
         return ""
     except IntegrityError as e:
-        print(e.args)
         if "UNIQUE constraint" in e.args[0]:
             return "Label name already exists, choose another name"
         else:
@@ -315,7 +314,6 @@ def save_manager(manager: Manager):
         manager.save()
         return ""
     except IntegrityError as e:
-        print(e.args)
         if "UNIQUE constraint" in e.args[0]:
             return "Username already exists, choose another username"
         else:
@@ -457,7 +455,6 @@ def save_employee(employee: Employee):
         employee.save()
         return ""
     except IntegrityError as e:
-        print(e.args)
         if "UNIQUE constraint" in e.args[0]:
             return "Employee phone number already exists, choose another phone number"
         else:
@@ -503,7 +500,6 @@ def attach_employee_to_site(employee, site, daily_rate = -1):
     try:
         assignment.save()
     except Exception as e:
-        print(e)
         error = "Failed to add " + employee.name + " to " + site.name + " site."
     return error
 
@@ -575,8 +571,6 @@ def create_employee_as_admin(request):
         if daily_rate == "":
             continue
         daily_rates.append((site, Decimal(daily_rate)))
-
-    print(daily_rates)
 
     employee = Employee()
     employee.name = employee_name
@@ -697,7 +691,6 @@ def update_employee(request, employee_pk):
     if request.method == "GET":
         labels = EmployeeLabel.objects.all()
         employee = Employee.objects.get(pk = employee_pk)
-        print(employee.get_sites_daily_rates())
         return render(
             request,
             "employees/employees/update-employee.html",
@@ -765,7 +758,7 @@ def payslips(request):
         mark_as_paid = mode == MARK_AS_PAID
 
         if not user.is_admin():
-            if employee.site != user.manager.site:
+            if not EmployeeSiteAssignment.objects.filter(employee= employee, site=user.manager.site).exists():
                 return HttpResponseNotAllowed("Unauthorized Access")
 
         payslip_generator = PayslipGenerator(employee, from_date, to_date, mark_as_paid)
