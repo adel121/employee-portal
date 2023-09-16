@@ -20,13 +20,12 @@
              value="{{ employee.name }}">
     </div>
     <div class="form-group">
-      <label for="phoneNumber">Phone Number [example: 03123456]</label>
+      <label for="phoneNumber">Phone Number</label>
       <input type="text"
              class="form-control"
              id="phoneNumber"
              name="phone_number"
-             pattern="[0-9]{8}"
-             maxlength="8"
+             pattern="[0-9]+"
              value="{{ employee.phone_number }}"
              required
              placeholder="Enter Employee Phone Number">
