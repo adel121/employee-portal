@@ -30,6 +30,8 @@ class PayslipGenerator:
         if self.mark_as_paid:
             workslots = workslots.filter(is_paid = False)
             for workslot in workslots:
+                if not workslot.is_valid:
+                    continue
                 workslot.is_paid = True
                 workslot.payment_date = date.today()
         return workslots

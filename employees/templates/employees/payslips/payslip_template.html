@@ -175,7 +175,7 @@
     </thead>
     <tbody>
       {% for workslot in workslots %}
-        <tr {% if not workslot.is_closed %}style="color:red"{% endif %}>
+        <tr {% if not workslot.is_closed or not workslot.is_valid %}style="color:red"{% endif %}>
           <th scope="row">{{ forloop.counter }}</th>
           <td>{{ workslot.date }}</td>
           <td>{{ workslot.site.name }}</td>

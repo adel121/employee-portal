@@ -131,6 +131,14 @@ class WorkSlot(models.Model):
         if self.start_time is not None and self.end_time is not None:
             return True
         return False
+    
+    @property
+    def is_valid(self):
+        normal_hours = self.normal_hours
+        break_hours = self.break_hours
+        overtime_hours = self.overtime
+
+        return normal_hours >= 0 and break_hours >= 0 and overtime_hours >= 0 and self.amount >= 0
 
     @property
     def normal_hours(self):
