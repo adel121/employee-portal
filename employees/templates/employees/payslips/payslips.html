@@ -51,7 +51,9 @@
     
 
     mode.on('change', function() {
-      $("#caution").toggle()
+      if (this.value == "readonly")
+      $("#caution").hide()
+      else $("#caution").show()
     });
 
   </script>
